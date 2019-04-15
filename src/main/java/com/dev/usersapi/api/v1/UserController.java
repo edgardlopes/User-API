@@ -2,6 +2,7 @@ package com.dev.usersapi.api.v1;
 
 import com.dev.usersapi.entity.Summary;
 import com.dev.usersapi.entity.User;
+import com.dev.usersapi.exception.ResourceNotFoundException;
 import com.dev.usersapi.repository.UserRepository;
 import java.util.List;
 import java.util.Optional;
@@ -34,8 +35,8 @@ public class UserController {
 
     @GetMapping("/{id}")
     public @ResponseBody
-    Optional<User> getById(@PathVariable Long id) {
-        return repository.findById(id);
+    User getById(@PathVariable Long id) {
+        return repository.findById(id).orElseThrow(ResourceNotFoundException::new);
     }
 
     @PostMapping
@@ -50,13 +51,16 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id){
+    public void delete(@PathVariable Long id) {
+        if(!repository.existsById(id)){
+            throw new ResourceNotFoundException();
+        }
         repository.deleteById(id);
     }
-    
+
     @GetMapping("/summary")
-    public List<Summary> getSummary(){
+    public List<Summary> getSummary() {
         return repository.getSummary();
     }
-    
+
 }
