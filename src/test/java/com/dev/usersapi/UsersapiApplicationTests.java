@@ -1,4 +1,4 @@
-package com.edgard.usersapi;
+package com.dev.usersapi;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
