@@ -4,7 +4,8 @@ import com.dev.usersapi.entity.Summary;
 import com.dev.usersapi.entity.User;
 import com.dev.usersapi.exception.ResourceNotFoundException;
 import com.dev.usersapi.repository.UserRepository;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -77,8 +78,13 @@ public class UserController {
     }
 
     @GetMapping("/summary")
-    public List<Summary> getSummary() {
-        return repository.getSummary();
+    public Map<String, Long> getSummary() {
+        Map<String, Long> map = new HashMap<>();
+        for (Summary summary : repository.getSummary()) {
+            map.put(summary.getUf(), summary.getCount());
+        }
+        
+        return map;
     }
 
 }
