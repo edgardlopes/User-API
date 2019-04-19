@@ -12,5 +12,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     @Query(value = "SELECT new com.dev.usersapi.entity.Summary(UPPER(u.uf), COUNT(u)) FROM User u GROUP BY UPPER(u.uf)")
     List<Summary> getSummary();
+    
+    boolean existsByCpf(String cpf);
 
+    boolean existsByCpfAndIdNot(String cpf, Long id);
 }

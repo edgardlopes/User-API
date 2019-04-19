@@ -5,11 +5,12 @@ import com.dev.usersapi.entity.User;
 import com.dev.usersapi.exception.ResourceNotFoundException;
 import com.dev.usersapi.repository.UserRepository;
 import java.util.List;
-import java.util.Optional;
 import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,19 +41,36 @@ public class UserController {
     }
 
     @PostMapping
-    public void create(@RequestBody @Valid User user) {
+    public void create(@RequestBody @Valid User user, BindingResult result) throws MethodArgumentNotValidException {
+        user.setId(null);
+
+        if (repository.existsByCpf(user.getCpf())) {
+            result.rejectValue("cpf", "field.already.exists", "Esse CPF já está em uso.");
+        }
+
+        if (result.hasErrors()) {
+            throw new MethodArgumentNotValidException(null, result);
+        }
+
         repository.save(user);
     }
 
     @PutMapping("/{id}")
-    public void create(@PathVariable Long id, @Valid @RequestBody User user) {
+    public void create(@PathVariable Long id, @Valid @RequestBody User user, BindingResult result) throws MethodArgumentNotValidException {
         user.setId(id);
+        if (repository.existsByCpfAndIdNot(user.getCpf(), id)) {
+            result.rejectValue("cpf", "field.already.exists", "Esse CPF já está em uso.");
+        }
+
+        if (result.hasErrors()) {
+            throw new MethodArgumentNotValidException(null, result);
+        }
         repository.save(user);
     }
 
     @DeleteMapping("/{id}")
     public void delete(@PathVariable Long id) {
-        if(!repository.existsById(id)){
+        if (!repository.existsById(id)) {
             throw new ResourceNotFoundException();
         }
         repository.deleteById(id);
